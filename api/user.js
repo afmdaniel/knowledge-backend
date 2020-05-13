@@ -10,7 +10,7 @@ module.exports = app => {
 
     const save = async (req, res) => {
         const user = { ...req.body }
-        if(req.params.id) user.id = req.params.id
+        if (req.params.id) user.id = req.params.id
 
         try {
             existsOrError(user.name, "Nome não informado!")
@@ -20,7 +20,7 @@ module.exports = app => {
             equalsOrError(user.password, user.confirmPassword, "Senhas não conferem")
 
             const userFromDB = await app.db('users').where({ email: user.email }).first()
-            if(!user.id) notExistsOrError(userFromDB, "Usuário já cadastrado")
+            if (!user.id) notExistsOrError(userFromDB, "Usuário já cadastrado")
         } catch (msg) {
             return res.status(400).send(msg)
         }
@@ -28,8 +28,7 @@ module.exports = app => {
         user.password = encryptPassaword(req.body.password)
         delete user.confirmPassword
 
-        console.log(user)
-        if(user.id) {
+        if (user.id) {
             app.db('users')
                 .update(user)
                 .where({ id: user.id })
@@ -43,5 +42,12 @@ module.exports = app => {
         }
     }
 
-    return { save }
+    const get = (req, res) => {
+        app.db('users')
+            .select('id', 'name', 'email', 'admin')
+            .then(users => res.json(users))
+            .catch(err => res.status(500))
+    }
+
+    return { save, get }
 }
