@@ -53,6 +53,7 @@ module.exports = app => {
         app.db('users')
             .where('id', req.params.id)
             .select('id', 'name', 'email', 'admin')
+            .first()
             .then(user => res.json(user))
             .catch(err => res.status(500))
     }
