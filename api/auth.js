@@ -10,12 +10,12 @@ module.exports = app => {
             return res.status(400).send("Informe usuário e senha!")
         }
 
-        const user = await app.db('users').where({ email: req.body.email }).first()
+        const user = await app.db('users').whereNull('deletedAt').where({ email: req.body.email }).first()
 
         try {
             existsOrError(user, 'Usuário não encontrado!')
         } catch(msg) {
-            res.status(400).send(msg)
+            return res.status(400).send(msg)
         }
 
         const matchPassword = bcrypt.compareSync(req.body.password, user.password)
