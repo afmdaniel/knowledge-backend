@@ -3,7 +3,7 @@ const { mongodb } = require('../.env')
 
 mongoose
     .connect(
-        `mongodb+srv://${mongodb.user}:${mongodb.password}@cluster0-1jjiw.mongodb.net/test?retryWrites=true&w=majority`,
+        `mongodb+srv://${mongodb.user}:${mongodb.password}@cluster0-1jjiw.mongodb.net/knowledge?retryWrites=true&w=majority`,
         { useNewUrlParser: true, useUnifiedTopology: true })
     .catch(err => {
         const msg = '[ERROR] Unable to connect with MongoDB'
