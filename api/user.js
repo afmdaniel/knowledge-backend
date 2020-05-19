@@ -10,6 +10,8 @@ module.exports = app => {
 
     const save = async (req, res) => {
         const user = { ...req.body }
+        let isDeletedUser = false
+
         if (req.params.id) user.id = req.params.id
 
         if(!req.originalUrl.startsWith('/users')) user.admin = false
@@ -23,7 +25,8 @@ module.exports = app => {
             equalsOrError(user.password, user.confirmPassword, "Senhas não conferem")
 
             const userFromDB = await app.db('users').where({ email: user.email }).first()
-            if (!user.id) notExistsOrError(userFromDB, "Usuário já cadastrado")
+            isDeletedUser = userFromDB.deletedAt? true : false
+            if (!user.id && !isDeletedUser) notExistsOrError(userFromDB, "Usuário já cadastrado")
         } catch (msg) {
             return res.status(400).send(msg)
         }
@@ -36,6 +39,13 @@ module.exports = app => {
                 .update(user)
                 .where({ id: user.id })
                 .whereNull('deletedAt')
+                .then(_ => res.status(204).send())
+                .catch(err => res.status(500).send(err))
+        } else if (isDeletedUser) {
+            user.deletedAt = null
+            app.db('users')
+                .update(user)
+                .where( {email: user.email })
                 .then(_ => res.status(204).send())
                 .catch(err => res.status(500).send(err))
         } else {
