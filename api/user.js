@@ -60,6 +60,7 @@ module.exports = app => {
         app.db('users')
             .select('id', 'name', 'email', 'admin')
             .whereNull('deletedAt')
+            .orderBy('id')
             .then(users => res.json(users))
             .catch(err => res.status(500))
     }
