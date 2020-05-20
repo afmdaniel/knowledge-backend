@@ -25,7 +25,7 @@ module.exports = app => {
             equalsOrError(user.password, user.confirmPassword, "Senhas não conferem")
 
             const userFromDB = await app.db('users').where({ email: user.email }).first()
-            isDeletedUser = userFromDB.deletedAt? true : false
+            userFromDB && (isDeletedUser = userFromDB.deletedAt? true : false) 
             if (!user.id && !isDeletedUser) notExistsOrError(userFromDB, "Usuário já cadastrado")
         } catch (msg) {
             return res.status(400).send(msg)
@@ -45,7 +45,7 @@ module.exports = app => {
             user.deletedAt = null
             app.db('users')
                 .update(user)
-                .where( {email: user.email })
+                .where({ email: user.email })
                 .then(_ => res.status(204).send())
                 .catch(err => res.status(500).send(err))
         } else {
